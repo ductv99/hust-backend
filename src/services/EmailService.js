@@ -50,7 +50,7 @@ const sendEmailCreateAccout = async (email, password) => {
 
     const info = await transporter.sendMail({
         from: '"LD STORE" <duc.tvd99@gmail.com>', // sender address
-        to: 'duc.tvd99@gmail.com', // list of receivers
+        to: email, // list of receivers
         subject: "LD STORE: Thông báo tạo tài khoản thành công", // Subject line
         text: "Chào mừng bạn đến với LD STORE", // plain text body
         html: `<div><b>Thông tin tài khoản của bạn</b></div>
