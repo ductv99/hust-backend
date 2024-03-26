@@ -10,6 +10,7 @@ const orderSchema = new mongoose.Schema({
             discount: { type: Number },
             color: { type: String, require: true },
             size: { type: Number, require: true },
+            sizeId: { type: String, required: true },
             product: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Product',

@@ -31,7 +31,7 @@ const orderSchema = new mongoose.Schema({
     paidAt: { type: Date },
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
-    statusOrder: { type: Boolean, default: false }
+    statusOrder: { type: Number, default: 1 } //1 cho xac nhan 2 xac nhan 3 huy
 },
     {
         timestamps: true,

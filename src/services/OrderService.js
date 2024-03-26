@@ -3,6 +3,7 @@ const Order = require("../models/OrderProduct")
 const Cart = require("../models/CartModel")
 const Product = require("../models/ProductModel")
 const EmailService = require('../services/EmailService')
+const { isValidObjectId } = require("mongoose")
 
 
 const createOrder = (newOrder) => {
@@ -163,7 +164,7 @@ const cancelOrderDetails = (id, data) => {
                     order = await Order.findOneAndUpdate(
                         { _id: id },
                         {
-                            statusOrder: true
+                            statusOrder: 3
                         },
                         {
                             new: true
@@ -222,46 +223,13 @@ const getAllOrder = () => {
 
 const createCart = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-        const { user } = newOrder
-        // console.log('user', user)
+        const { user, orderItems } = newOrder
+        console.log(user)
         try {
-            // const promises = orderItems.map(async (order) => {
-            //     // console.log(typeof (order.amount))
-            //     const productData = await Product.findOneAndUpdate({
-            //         _id: order.product,
-            //         'countInStock.color': order.color,
-            //         'countInStock.sizes.size': order.size,
-            //         'countInStock.sizes.quantity': { $gte: order.amount }
-            //     }, {
-            //         $inc: {
-            //             'countInStock.$[elem].sizes.$[sizeElem].quantity': -order.amount,
-            //             selled: +order.amount
-            //         }
-            //     }, {
-            //         new: true,
-            //         arrayFilters: [
-            //             { 'elem.color': order.color },
-            //             { 'sizeElem.size': order.size }
-            //         ]
-            //     })
-            //     if (productData) {
-            //         return {
-            //             status: 'success',
-            //             message: 'success'
-            //         }
-            //     } else {
-            //         return ({
-            //             status: "ERR",
-            //             message: "something wrong in the create order",
-            //             id: order.product
-            //         })
-            //     }
-            // })
-
-
+            await Cart.deleteMany({ user: user });
             await Cart.create({
                 orderItems,
-                user: user,
+                user: user
             })
             resolve({
                 status: 'success',
@@ -275,11 +243,63 @@ const createCart = (newOrder) => {
     })
 }
 
+
+const getAllCart = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const order = await Cart.find({
+                user: id
+            }).sort({ createdAt: -1, updatedAt: -1 })
+            if (order === null) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The order is not defined'
+                })
+            }
+            resolve({
+                status: 'OK',
+                message: 'SUCESS',
+                data: order
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+const updateCartStatus = (id, data) => {
+    return new Promise(async (resolve, reject) => {
+        console.log("data", data)
+        try {
+            const checkUser = await Order.findOne({
+                _id: id
+            })
+            if (checkUser === null) {
+                resolve({
+                    status: "ERR",
+                    message: "user is not existed"
+                })
+            }
+            const updateStatus = await Order.findByIdAndUpdate(id, data, { new: true })
+            resolve({
+                status: "success",
+                message: "Success",
+                data: updateStatus
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
+
+
 module.exports = {
     createOrder,
     getAllOrderDetails,
     getDetailsOrder,
     cancelOrderDetails,
     getAllOrder,
-    createCart
+    createCart,
+    getAllCart,
+    updateCartStatus
 }
